@@ -19,7 +19,8 @@ const uint8_t MID_STATION_1 = A2;
 /** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;
 
-int travelDirection;
+int trainDirection;
+int trainSpeed;
 
 bool isAtStation(uint8_t pin)
 {
@@ -37,15 +38,21 @@ int getSpeed()
   return map(potValue, 0, 1023, 0, 255);
 }
 
+void updateSpeed()
+{
+  trainSpeed = getSpeed();
+  analogWrite(MOTOR_SPEED, trainSpeed);
+}
+
 void stopTrain()
 {
   digitalWrite(MOTOR_FORWARD, OFF);
   digitalWrite(MOTOR_REVERSE, OFF);
 }
 
-void resumeTravel(int direction)
+void startTrain(int direction)
 {
-  travelDirection = direction;
+  trainDirection = direction;
   digitalWrite(MOTOR_FORWARD, direction == FORWARD ? ON : OFF);
   digitalWrite(MOTOR_REVERSE, direction == REVERSE ? ON : OFF);
 }
@@ -54,18 +61,23 @@ void stopAndGo(int direction)
 {
   stopTrain();
   delay(5000);
-  resumeTravel(direction);
+  startTrain(direction);
   delay(1500);
 }
 
 void reverseDirection()
 {
-  stopAndGo(travelDirection == FORWARD ? REVERSE : FORWARD);
+  stopAndGo(trainDirection == FORWARD ? REVERSE : FORWARD);
 }
 
 void pauseAndResume()
 {
-  stopAndGo(travelDirection);
+  stopAndGo(trainDirection);
+}
+
+void reportStatus()
+{
+  Serial.println("Speed: " + String(trainSpeed) + " " + (trainDirection == FORWARD) ? "forward" : "reverse");
 }
 
 void setup()
@@ -78,13 +90,8 @@ void setup()
 
 void loop()
 {
-  int currentSpeed = getSpeed();
-
-  analogWrite(MOTOR_SPEED, currentSpeed);
-
-  Serial.println(travelDirection);
-  Serial.println(currentSpeed);
-
+  updateSpeed();
+  reportStatus();
   delay(200);
 
   if (isAtStation(TERMINUS_1) || isAtStation(TERMINUS_2))
