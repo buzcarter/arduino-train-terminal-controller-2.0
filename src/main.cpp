@@ -3,13 +3,15 @@
 const int FORWARD = 0;
 const int REVERSE = 1;
 
-const int DRIVER_A_FORWARD = 5;
-const int DRIVER_A_REVERSE = 6;
-const int DRIVER_A_OUTPUT_LEVEL = 3;
+// Arduinao (Output) Digital PWM Pins to Motor Driver
+const int MOTOR_FORWARD = 5;
+const int MOTOR_REVERSE = 6;
+const int MOTOR_SPEED = 3;
 
-const uint8_t TERMINUS_1_PIN = A0;
-const uint8_t TERMINUS_2_PIN = A1;
-const uint8_t MID_STATION_1_PIN = A2;
+// Arduino Analog Input Pins from IR proximity sensors
+const uint8_t TERMINUS_1 = A0;
+const uint8_t TERMINUS_2 = A1;
+const uint8_t MID_STATION_1 = A2;
 
 #define ON HIGH
 #define OFF LOW
@@ -19,9 +21,9 @@ const int SENSOR_THRESHOLD = 500;
 
 int travelDirection;
 
-bool isAtStation(int sensorValue)
+bool isAtStation(uint8_t pin)
 {
-  return sensorValue < SENSOR_THRESHOLD;
+  return analogRead(pin) < SENSOR_THRESHOLD;
 }
 
 /**
@@ -37,15 +39,15 @@ int getSpeed()
 
 void stopTrain()
 {
-  digitalWrite(DRIVER_A_FORWARD, OFF);
-  digitalWrite(DRIVER_A_REVERSE, OFF);
+  digitalWrite(MOTOR_FORWARD, OFF);
+  digitalWrite(MOTOR_REVERSE, OFF);
 }
 
 void resumeTravel(int direction)
 {
   travelDirection = direction;
-  digitalWrite(DRIVER_A_FORWARD, direction == FORWARD ? ON : OFF);
-  digitalWrite(DRIVER_A_REVERSE, direction == REVERSE ? ON : OFF);
+  digitalWrite(MOTOR_FORWARD, direction == FORWARD ? ON : OFF);
+  digitalWrite(MOTOR_REVERSE, direction == REVERSE ? ON : OFF);
 }
 
 void stopAndGo(int direction)
@@ -56,40 +58,41 @@ void stopAndGo(int direction)
   delay(1500);
 }
 
+void reverseDirection()
+{
+  stopAndGo(travelDirection == FORWARD ? REVERSE : FORWARD);
+}
+
+void pauseAndResume()
+{
+  stopAndGo(travelDirection);
+}
+
 void setup()
 {
   Serial.begin(9600);
-  pinMode(DRIVER_A_FORWARD, OUTPUT);
-  pinMode(DRIVER_A_REVERSE, OUTPUT);
-  pinMode(DRIVER_A_OUTPUT_LEVEL, OUTPUT);
+  pinMode(MOTOR_FORWARD, OUTPUT);
+  pinMode(MOTOR_REVERSE, OUTPUT);
+  pinMode(MOTOR_SPEED, OUTPUT);
 }
 
 void loop()
 {
-  int terminus1 = analogRead(TERMINUS_1_PIN);
-  int terminus2 = analogRead(TERMINUS_2_PIN);
-
-  int midStation1 = analogRead(MID_STATION_1_PIN);
-
   int currentSpeed = getSpeed();
 
-  analogWrite(DRIVER_A_OUTPUT_LEVEL, currentSpeed);
+  analogWrite(MOTOR_SPEED, currentSpeed);
 
   Serial.println(travelDirection);
   Serial.println(currentSpeed);
 
   delay(200);
 
-  if (isAtStation(terminus1))
+  if (isAtStation(TERMINUS_1) || isAtStation(TERMINUS_2))
   {
-    stopAndGo(REVERSE);
+    reverseDirection();
   }
-  else if (isAtStation(terminus2))
+  else if (isAtStation(MID_STATION_1))
   {
-    stopAndGo(FORWARD);
-  }
-  else if (isAtStation(midStation1))
-  {
-    stopAndGo(travelDirection);
+    pauseAndResume();
   }
 }
