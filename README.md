@@ -21,8 +21,10 @@ https://youtu.be/PoOxFS2DNpI?si=a4vY9Ln4eqhzoHmL
 
 ## Circuit Diagram
 
+![Circut Diagram/Schematic](./docs/images/Wiring-Diagram-Fritzing.png)
+
 ## Notes
 
 I'll do an initial commit exactly as Jimmy wrote it. Then I'll refactor for readability.
 
-Direction of travel -- "Left" or "Right" -- are completely arbitrary, so pick and move on.
+Direction of travel -- "Left" or "Right", "Forward" or "Reverse" -- are completely arbitrary, so pick and move on.

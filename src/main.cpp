@@ -3,13 +3,14 @@
 const int LEFT = 0;
 const int RIGHT = 1;
 
+/** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;
 
 int travelDirection;
 
-bool isAtStation(int voltage)
+bool isAtStation(int sensorValue)
 {
-  return voltage < SENSOR_THRESHOLD;
+  return sensorValue < SENSOR_THRESHOLD;
 }
 
 /**
@@ -56,7 +57,7 @@ void loop()
 {
   int terminus1 = analogRead(A0);
   int terminus2 = analogRead(A1);
-  
+
   int midStation1 = analogRead(A2);
 
   int currentSpeed = getSpeed();
@@ -72,13 +73,11 @@ void loop()
   {
     stopAndGo(RIGHT);
   }
-
-  if (isAtStation(terminus2))
+  else if (isAtStation(terminus2))
   {
     stopAndGo(LEFT);
   }
-
-  if (isAtStation(midStation1))
+  else if (isAtStation(midStation1))
   {
     stopAndGo(travelDirection);
   }
