@@ -36,6 +36,14 @@ void resumeTravel(int direction)
   digitalWrite(6, direction == RIGHT ? HIGH : LOW);
 }
 
+void stopAndGo(int direction)
+{
+  stopTrain();
+  delay(5000);
+  resumeTravel(direction);
+  delay(1500);
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -48,6 +56,7 @@ void loop()
 {
   int terminus1 = analogRead(A0);
   int terminus2 = analogRead(A1);
+  
   int midStation1 = analogRead(A2);
 
   int currentSpeed = getSpeed();
@@ -61,25 +70,16 @@ void loop()
 
   if (isAtStation(terminus1))
   {
-    stopTrain();
-    delay(5000);
-    resumeTravel(LEFT);
-    delay(1500);
+    stopAndGo(RIGHT);
   }
 
   if (isAtStation(terminus2))
   {
-    stopTrain();
-    delay(5000);
-    resumeTravel(RIGHT);
-    delay(1500);
+    stopAndGo(LEFT);
   }
 
   if (isAtStation(midStation1))
   {
-    stopTrain();
-    delay(5000);
-    resumeTravel(travelDirection);
-    delay(1500);
+    stopAndGo(travelDirection);
   }
 }
