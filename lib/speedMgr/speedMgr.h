@@ -1,0 +1,2 @@
+void updateSpeed();
+int getSpeed();
