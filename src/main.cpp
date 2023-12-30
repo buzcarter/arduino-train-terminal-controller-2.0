@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TaskScheduler.h>
 
 #define ON HIGH
 #define OFF LOW
@@ -21,6 +22,8 @@ const uint8_t POTENTIOMETER = A3;
 /** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;
 
+const int TASK_FREQUENCY = 200; // ms
+
 int trainSpeed;
 int trainDirection;
 
@@ -33,28 +36,17 @@ bool isAtStation(uint8_t pin)
   return analogRead(pin) < SENSOR_THRESHOLD;
 }
 
-bool isAtTerminus() {
+bool isAtTerminus()
+{
   return isAtStation(TERMINUS_1) || isAtStation(TERMINUS_2);
 }
 
 /**
  * Makes adding additional stations easier, just OR ('||') them together
  */
-bool isAtMiddleStation() {
-  return isAtStation(MID_STATION_1);
-}
-
-/**
- * Get desired speed from the potentiometer, scale it, and set the
- * motor speed appropriately.
- * `map` adjustments to address disparity between analog read (10 bit)
- * and analog write (8 bit)
- */
-void updateSpeed()
+bool isAtMiddleStation()
 {
-  int potValue = analogRead(POTENTIOMETER);
-  trainSpeed = map(potValue, 0, 1023, 0, 255);
-  analogWrite(MOTOR_SPEED, trainSpeed);
+  return isAtStation(MID_STATION_1);
 }
 
 void stopTrain()
@@ -87,10 +79,41 @@ void pauseAndResume()
   stopAndGo(trainDirection);
 }
 
-void reportStatus()
+void checkStationsTask()
+{
+  if (isAtTerminus())
+  {
+    reverseDirection();
+  }
+  else if (isAtMiddleStation())
+  {
+    pauseAndResume();
+  }
+}
+
+/**
+ * Get desired speed from the potentiometer, scale it, and set the
+ * motor speed appropriately.
+ * `map` adjustments to address disparity between analog read (10 bit)
+ * and analog write (8 bit)
+ */
+void updateSpeedTask()
+{
+  int potValue = analogRead(POTENTIOMETER);
+  trainSpeed = map(potValue, 0, 1023, 0, 255);
+  analogWrite(MOTOR_SPEED, trainSpeed);
+}
+
+void sendFeedbackTask()
 {
   Serial.println("Speed: " + String(trainSpeed) + " " + (trainDirection == FORWARD) ? "forward" : "reverse");
 }
+
+Scheduler runner;
+
+Task stationTask(TASK_FREQUENCY, TASK_FOREVER, &checkStationsTask, &runner, true);
+Task speedTask(TASK_FREQUENCY, TASK_FOREVER, &updateSpeedTask, &runner, true);
+Task feedbackTask(TASK_FREQUENCY, TASK_FOREVER, &sendFeedbackTask, &runner, true);
 
 void setup()
 {
@@ -102,16 +125,5 @@ void setup()
 
 void loop()
 {
-  updateSpeed();
-  reportStatus();
-  delay(200);
-
-  if (isAtTerminus())
-  {
-    reverseDirection();
-  }
-  else if (isAtMiddleStation())
-  {
-    pauseAndResume();
-  }
+  runner.execute();
 }
