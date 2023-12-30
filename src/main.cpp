@@ -1,92 +1,85 @@
 #include <Arduino.h>
 
-int station1; // End Station 1
-int station2; // End Station 2
-int station3; // Middle Station
+const int LEFT = 0;
+const int RIGHT = 1;
 
-int Speed; // actualSpeed
-int Direction; // travelDirection
-int speedval; // adjustedSpeed
+const int SENSOR_THRESHOLD = 500;
 
-void setup() {
+int travelDirection;
+
+bool isAtStation(int voltage)
+{
+  return voltage < SENSOR_THRESHOLD;
+}
+
+/**
+ * Get desired speed from the potentiometer.
+ * Makes adjustments to address disparity between analog read (10 bit)
+ * and analog write (8 bit)
+ */
+int getSpeed()
+{
+  int potValue = analogRead(A3);
+  return map(potValue, 0, 1023, 0, 255);
+}
+
+void stopTrain()
+{
+  digitalWrite(5, LOW);
+  digitalWrite(6, LOW);
+}
+
+void resumeTravel(int direction)
+{
+  travelDirection = direction;
+  digitalWrite(5, direction == LEFT ? HIGH : LOW);
+  digitalWrite(6, direction == RIGHT ? HIGH : LOW);
+}
+
+void setup()
+{
   Serial.begin(9600);
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
   pinMode(3, OUTPUT); // control pin of the motor driver
 }
 
-void loop() {
-  // IR proximity sensors
-  station1 = analogRead(A0);
-  station2 = analogRead(A1);
-  station3 = analogRead(A2);
+void loop()
+{
+  int terminus1 = analogRead(A0);
+  int terminus2 = analogRead(A1);
+  int midStation1 = analogRead(A2);
 
-  speedval = analogRead(A3); // potentiometer
-  Speed = map(speedval, 0, 1023, 0, 255); // analog reader is 10bit, PWM Timer is 8bit
+  int currentSpeed = getSpeed();
 
-  analogWrite(3, Speed);
-  Serial.println(Direction);
-  Serial.println(Speed);
+  analogWrite(3, currentSpeed);
+
+  Serial.println(travelDirection);
+  Serial.println(currentSpeed);
+
   delay(200);
 
-  // midpoint of a sensor being tripped ~500
-  if (station1 < 500) {
-    // train is in front of End Station 1's sensor
-
-    // stop sending power to the track
-    digitalWrite(5, LOW);
-    digitalWrite(6, LOW);
-
-    Direction = 0;
-    
-    // sit idle for 5 seconds
+  if (isAtStation(terminus1))
+  {
+    stopTrain();
     delay(5000);
-    // start moving in the "0" direction
-    digitalWrite(5, HIGH);
-    digitalWrite(6, LOW);
-    delay(1500);
-  }
-  
-  if (station2 < 500) {
-    // train is in front of End Station 2's sensor
-
-    // stop sending power to the track
-    digitalWrite(5, LOW);
-    digitalWrite(6, LOW);
-
-    // reverse direction
-    Direction = 1;
-    
-    delay(5000);
-
-    // start moving in the "1" direction
-    digitalWrite(5, LOW);
-    digitalWrite(6, HIGH);
-  }
-  
-  // Stations located around the middle of the track
-  // for these we'll just pause for a moment before continuing on our way (same direction)
-  if (station3 < 500 && Direction == 1) {
-    digitalWrite(5, LOW);
-    digitalWrite(6, LOW);
-    
-    delay(5000);
-    
-    digitalWrite(5, LOW);
-    digitalWrite(6, HIGH);
-    
+    resumeTravel(LEFT);
     delay(1500);
   }
 
-  if (station3 < 500 && Direction == 0) {
-    digitalWrite(5, LOW);
-    digitalWrite(6, LOW);
-    
+  if (isAtStation(terminus2))
+  {
+    stopTrain();
     delay(5000);
-    
-    digitalWrite(5, HIGH);
-    digitalWrite(6, LOW);
-    
+    resumeTravel(RIGHT);
+    delay(1500);
+  }
+
+  if (isAtStation(midStation1))
+  {
+    stopTrain();
+    delay(5000);
+    resumeTravel(travelDirection);
     delay(1500);
   }
 }
