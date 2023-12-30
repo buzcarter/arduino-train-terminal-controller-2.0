@@ -1,7 +1,18 @@
 #include <Arduino.h>
 
-const int LEFT = 0;
-const int RIGHT = 1;
+const int FORWARD = 0;
+const int REVERSE = 1;
+
+const int DRIVER_A_FORWARD = 5;
+const int DRIVER_A_REVERSE = 6;
+const int DRIVER_A_OUTPUT_LEVEL = 3;
+
+const uint8_t TERMINUS_1_PIN = A0;
+const uint8_t TERMINUS_2_PIN = A1;
+const uint8_t MID_STATION_1_PIN = A2;
+
+#define ON HIGH
+#define OFF LOW
 
 /** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;
@@ -26,15 +37,15 @@ int getSpeed()
 
 void stopTrain()
 {
-  digitalWrite(5, LOW);
-  digitalWrite(6, LOW);
+  digitalWrite(DRIVER_A_FORWARD, OFF);
+  digitalWrite(DRIVER_A_REVERSE, OFF);
 }
 
 void resumeTravel(int direction)
 {
   travelDirection = direction;
-  digitalWrite(5, direction == LEFT ? HIGH : LOW);
-  digitalWrite(6, direction == RIGHT ? HIGH : LOW);
+  digitalWrite(DRIVER_A_FORWARD, direction == FORWARD ? ON : OFF);
+  digitalWrite(DRIVER_A_REVERSE, direction == REVERSE ? ON : OFF);
 }
 
 void stopAndGo(int direction)
@@ -48,21 +59,21 @@ void stopAndGo(int direction)
 void setup()
 {
   Serial.begin(9600);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(3, OUTPUT); // control pin of the motor driver
+  pinMode(DRIVER_A_FORWARD, OUTPUT);
+  pinMode(DRIVER_A_REVERSE, OUTPUT);
+  pinMode(DRIVER_A_OUTPUT_LEVEL, OUTPUT);
 }
 
 void loop()
 {
-  int terminus1 = analogRead(A0);
-  int terminus2 = analogRead(A1);
+  int terminus1 = analogRead(TERMINUS_1_PIN);
+  int terminus2 = analogRead(TERMINUS_2_PIN);
 
-  int midStation1 = analogRead(A2);
+  int midStation1 = analogRead(MID_STATION_1_PIN);
 
   int currentSpeed = getSpeed();
 
-  analogWrite(3, currentSpeed);
+  analogWrite(DRIVER_A_OUTPUT_LEVEL, currentSpeed);
 
   Serial.println(travelDirection);
   Serial.println(currentSpeed);
@@ -71,11 +82,11 @@ void loop()
 
   if (isAtStation(terminus1))
   {
-    stopAndGo(RIGHT);
+    stopAndGo(REVERSE);
   }
   else if (isAtStation(terminus2))
   {
-    stopAndGo(LEFT);
+    stopAndGo(FORWARD);
   }
   else if (isAtStation(midStation1))
   {
