@@ -1,9 +1,12 @@
 #include <Arduino.h>
 
+#define ON HIGH
+#define OFF LOW
+
 const int FORWARD = 0;
 const int REVERSE = 1;
 
-// Arduinao (Output) Digital PWM Pins to Motor Driver
+// Arduino (Output) Digital PWM Pins to Motor Driver
 const int MOTOR_FORWARD = 5;
 const int MOTOR_REVERSE = 6;
 const int MOTOR_SPEED = 3;
@@ -13,34 +16,44 @@ const uint8_t TERMINUS_1 = A0;
 const uint8_t TERMINUS_2 = A1;
 const uint8_t MID_STATION_1 = A2;
 
-#define ON HIGH
-#define OFF LOW
+const uint8_t POTENTIOMETER = A3;
 
 /** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;
 
-int trainDirection;
 int trainSpeed;
+int trainDirection;
 
+/**
+ * Check if the train is at a station by reading the IR proximity sensor
+ * (corresponding to `pin`) and comparing it to the threshold.
+ */
 bool isAtStation(uint8_t pin)
 {
   return analogRead(pin) < SENSOR_THRESHOLD;
 }
 
-/**
- * Get desired speed from the potentiometer.
- * Makes adjustments to address disparity between analog read (10 bit)
- * and analog write (8 bit)
- */
-int getSpeed()
-{
-  int potValue = analogRead(A3);
-  return map(potValue, 0, 1023, 0, 255);
+bool isAtTerminus() {
+  return isAtStation(TERMINUS_1) || isAtStation(TERMINUS_2);
 }
 
+/**
+ * Makes adding additional stations easier, just OR ('||') them together
+ */
+bool isAtMiddleStation() {
+  return isAtStation(MID_STATION_1);
+}
+
+/**
+ * Get desired speed from the potentiometer, scale it, and set the
+ * motor speed appropriately.
+ * `map` adjustments to address disparity between analog read (10 bit)
+ * and analog write (8 bit)
+ */
 void updateSpeed()
 {
-  trainSpeed = getSpeed();
+  int potValue = analogRead(POTENTIOMETER);
+  trainSpeed = map(potValue, 0, 1023, 0, 255);
   analogWrite(MOTOR_SPEED, trainSpeed);
 }
 
@@ -60,9 +73,8 @@ void startTrain(int direction)
 void stopAndGo(int direction)
 {
   stopTrain();
-  delay(5000);
+  delay(5000); // ideally wouldn't block, but this is a simple example
   startTrain(direction);
-  delay(1500);
 }
 
 void reverseDirection()
@@ -94,11 +106,11 @@ void loop()
   reportStatus();
   delay(200);
 
-  if (isAtStation(TERMINUS_1) || isAtStation(TERMINUS_2))
+  if (isAtTerminus())
   {
     reverseDirection();
   }
-  else if (isAtStation(MID_STATION_1))
+  else if (isAtMiddleStation())
   {
     pauseAndResume();
   }
