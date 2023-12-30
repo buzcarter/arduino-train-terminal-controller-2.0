@@ -20,5 +20,3 @@ const uint8_t POTENTIOMETER = A3;
 
 /** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;
-
-const int TASK_FREQUENCY = 200; // ms
