@@ -1,3 +1,5 @@
+const int CLOCKIE_ON_RATIO = 3;
+const int CLOCKIE_INTERVAL = 1000 / CLOCKIE_ON_RATIO ;
 
 bool startUpTest();
 void showDirection(int direction);

@@ -24,15 +24,9 @@ void setup()
   pinMode(SPEED_MAX_LED_OUT, OUTPUT);
 }
 
-void clockie() {
-  static int flashTick = 0;
-  flashTick++;
-  digitalWrite(CLOCK_LED_OUT, flashTick % 3 == 0 ? ON : OFF);
-}
-
 Scheduler taskRunner;
 
-Task stationTask(333, TASK_FOREVER, &clockie, &taskRunner, true);
+Task stationTask(CLOCKIE_INTERVAL, TASK_FOREVER, &toggleClockTickIndicator, &taskRunner, true);
 
 void loop()
 {

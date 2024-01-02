@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <constants.h>
+#include <ledMgr.h>
 
 const int NUM_CLOCK_TICKS = 20;
 
@@ -33,11 +34,11 @@ bool startUpTest()
   return false;
 }
 
-bool isOn = false;
 void toggleClockTickIndicator()
 {
-  digitalWrite(CLOCK_LED_OUT, isOn ? ON : OFF);
-  isOn = !isOn;
+  static int flashTick = 0;
+  flashTick++;
+  digitalWrite(CLOCK_LED_OUT, flashTick % CLOCKIE_ON_RATIO == 0 ? ON : OFF);
 }
 
 void showSpeed(int speed)
