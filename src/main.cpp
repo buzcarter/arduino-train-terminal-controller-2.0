@@ -30,21 +30,9 @@ Task stationTask(CLOCKIE_INTERVAL, TASK_FOREVER, &toggleClockTickIndicator, &tas
 
 void loop()
 {
+  if (!isLEDTestDone())
+  {
+    return;
+  }
   taskRunner.execute();
-
-  // static bool isOn = false;
-  // isOn = !isOn;
-  // int value = isOn ? LOW : HIGH;
-
-
-  // digitalWrite(FORWARD_LED_OUT, value);
-  // digitalWrite(LAYOVER_LED_OUT, value);
-
-  // digitalWrite(SPEED_MIN_LED_OUT, ON);
-  // digitalWrite(SPEED_20_LED_OUT, ON);
-  // digitalWrite(SPEED_40_LED_OUT, ON);
-  // digitalWrite(SPEED_80_LED_OUT, ON);
-  // digitalWrite(SPEED_MAX_LED_OUT, ON);
-
-  // delay(100);
 }

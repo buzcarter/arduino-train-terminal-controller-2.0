@@ -2,25 +2,35 @@
 #include <constants.h>
 #include <ledMgr.h>
 
-const int NUM_CLOCK_TICKS = 20;
-
-bool startUpTest()
+/** Returns true for first 5 seconds of startup. Flashes LEDs to verify working. */
+bool isLEDTestDone()
 {
-  static int clockTick = 0;
-  static bool isOn = false;
-
-  clockTick++;
-  if (clockTick > NUM_CLOCK_TICKS)
+  static bool isDone = false;
+  if (isDone)
   {
     return true;
   }
 
-  if (clockTick % 5 == 0)
+  unsigned long elapsedTime = millis();
+  bool isOn = false;
+
+  if (elapsedTime >= 4000)
   {
-    isOn = !isOn;
+    isDone = true;
+    isOn = false;
+  }
+  else
+  {
+    isOn = (elapsedTime / 333) % 2 != 0;
   }
 
   uint8_t val = isOn ? ON : OFF;
+  if (digitalRead(CLOCK_LED_OUT) == val)
+  {
+    return false;
+  }
+
+  digitalWrite(CLOCK_LED_OUT, val);
 
   digitalWrite(FORWARD_LED_OUT, val);
   digitalWrite(LAYOVER_LED_OUT, val);
@@ -36,9 +46,9 @@ bool startUpTest()
 
 void toggleClockTickIndicator()
 {
-  static int flashTick = 0;
-  flashTick++;
-  digitalWrite(CLOCK_LED_OUT, flashTick % CLOCKIE_ON_RATIO == 0 ? ON : OFF);
+  static int tick = 0;
+  digitalWrite(CLOCK_LED_OUT, tick % CLOCKIE_ON_RATIO == 0 ? ON : OFF);
+  tick++;
 }
 
 void showSpeed(int speed)
