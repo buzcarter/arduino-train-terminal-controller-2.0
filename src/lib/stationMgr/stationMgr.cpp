@@ -1,14 +1,20 @@
 #include <Arduino.h>
 #include <constants.h>
 #include <ledMgr.h>
+#include <msgMgr.h>
 
-int trainDirection;
+int trainDirection = FORWARD;
 unsigned long delayExpiry = 0;
 
 void setDirection(int direction)
 {
+  if (trainDirection == direction)
+  {
+    return;
+  }
   trainDirection = direction;
   showDirection(direction);
+  msgReversingDirection();
 }
 
 String getDirection()
@@ -30,13 +36,39 @@ void setDelay(int length)
   delayExpiry = millis() + length;
 }
 
+String getStationName(uint8_t pin)
+{
+  switch (pin)
+  {
+  case TERMINUS_1_INPUT:
+    return "Terminus 1";
+  case TERMINUS_2_INPUT:
+    return "Terminus 2";
+  case MID_STATION_1_INPUT:
+    return "Middle Station 1";
+  default:
+    return "Unknown";
+  }
+}
+
 /**
  * Check if the train is at a station by reading the IR proximity sensor
  * (corresponding to `pin`) and comparing it to the threshold.
  */
 bool isAtStation(uint8_t pin)
 {
-  return analogRead(pin) < SENSOR_THRESHOLD;
+  static int lastState = false;
+  const bool isAtStation = analogRead(pin) < SENSOR_THRESHOLD;
+  if (lastState == isAtStation)
+  {
+    return false;
+  }
+  lastState = isAtStation;
+  if (isAtStation)
+  {
+    msgArrivedAtStation(getStationName(pin) + " (pin " + String(pin) + ")");
+  }
+  return isAtStation;
 }
 
 bool isAtTerminus()
@@ -55,6 +87,7 @@ bool isAtMiddleStation()
 void stopTrain()
 {
   showLayover(true);
+  msgStopped();
 
   digitalWrite(MOTOR_FORWARD_OUT, OFF);
   digitalWrite(MOTOR_REVERSE_OUT, OFF);
@@ -64,7 +97,7 @@ void startTrain()
 {
   setDelay(0);
   showLayover(false);
-
+  msgStart();
   digitalWrite(MOTOR_FORWARD_OUT, trainDirection == FORWARD ? ON : OFF);
   digitalWrite(MOTOR_REVERSE_OUT, trainDirection == REVERSE ? ON : OFF);
 }
@@ -77,11 +110,19 @@ void scheduleTrainStart(int length)
 
 bool pendingActionsResolved()
 {
+  static bool hasFired = false;
   if (hasDelay())
   {
+    hasFired = false;
     return false;
   }
 
+  if (hasFired)
+  {
+    return true;
+  }
+
+  hasFired = true;
   startTrain();
   return true;
 }

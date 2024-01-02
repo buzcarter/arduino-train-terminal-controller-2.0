@@ -15,3 +15,23 @@ void msgSendSpeedInfo()
   lastMsg = msg;
   Serial.println(msg);
 }
+
+void msgReversingDirection()
+{
+  Serial.println("Reversing direction");
+}
+
+void msgArrivedAtStation(String stationName)
+{
+  Serial.println("Arrived at station " + stationName);
+}
+
+void msgStart()
+{
+  Serial.println("Traveling");
+}
+
+void msgStopped()
+{
+  Serial.println("Stopped");
+}

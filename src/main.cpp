@@ -13,11 +13,10 @@ const int SPEED_SAMPLING_INTERVAL = 50;
 Scheduler taskRunner;
 
 void checkStationsTask();
-void updateSpeedTask();
 
 Task t0(CLOCKIE_INTERVAL, TASK_FOREVER, &updateClockIndicator, &taskRunner, true);
 Task t1(MAIN_TASKS_INTERVAL, TASK_FOREVER, &checkStationsTask, &taskRunner, true);
-Task t2(INFO_TASKS_INTERVAL, TASK_FOREVER, &updateSpeedTask, &taskRunner, true);
+Task t2(INFO_TASKS_INTERVAL, TASK_FOREVER, &updateSpeed, &taskRunner, true);
 Task t3(MAIN_TASKS_INTERVAL, TASK_FOREVER, &msgSendSpeedInfo, &taskRunner, true);
 Task t4(SPEED_SAMPLING_INTERVAL, TASK_FOREVER, &sampleSpeed, &taskRunner, true);
 
@@ -36,11 +35,6 @@ void checkStationsTask()
   {
     pauseAndResume();
   }
-}
-
-void updateSpeedTask()
-{
-  updateSpeed();
 }
 
 void setup()
