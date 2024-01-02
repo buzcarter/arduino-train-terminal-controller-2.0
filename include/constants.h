@@ -24,11 +24,12 @@ const int SPEED_80_LED_OUT      = 12;
 const int SPEED_MAX_LED_OUT     = 13;
 
 // Arduino Analog Input Pins from IR proximity sensors
-const uint8_t TERMINUS_1_INPUT    = A0;
-const uint8_t TERMINUS_2_INPUT    = A1;
-const uint8_t MID_STATION_1_INPUT = A2;
+const uint8_t TERMINUS_1_INPUT     = A0;
+const uint8_t TERMINUS_2_INPUT     = A1;
 
-const uint8_t POTENTIOMETER_INPUT = A3;
+const uint8_t MID_STATION_1_INPUT  = A2;
+
+const uint8_t POTENTIOMETER_INPUT  = A3;
 
 /** Cutoff for IR proximity filter */
 const int SENSOR_THRESHOLD = 500;

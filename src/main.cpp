@@ -5,6 +5,45 @@
 #include <stationMgr.h>
 #include <TaskScheduler.h>
 
+const int MAIN_TASKS_INTERVAL = 200;
+
+Scheduler taskRunner;
+
+void checkStationsTask();
+void updateSpeedTask();
+void sendFeedbackTask();
+
+Task clockIndicatorTask(CLOCKIE_INTERVAL, TASK_FOREVER, &updateClockIndicator, &taskRunner, true);
+Task stationTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &checkStationsTask, &taskRunner, true);
+Task speedTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &updateSpeedTask, &taskRunner, true);
+Task feedbackTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &sendFeedbackTask, &taskRunner, true);
+
+void checkStationsTask()
+{
+  if (isAtTerminus())
+  {
+    stationTask.disable();
+    reverseDirection();
+    stationTask.enable();
+  }
+  else if (isAtMiddleStation())
+  {
+    stationTask.disable();
+    pauseAndResume();
+    stationTask.enable();
+  }
+}
+
+void updateSpeedTask()
+{
+  updateSpeed();
+}
+
+void sendFeedbackTask()
+{
+  Serial.println("Speed: " + String(getSpeed()) + " " + getDirection());
+}
+
 void setup()
 {
   Serial.begin(9600);
@@ -23,10 +62,6 @@ void setup()
   pinMode(SPEED_80_LED_OUT, OUTPUT);
   pinMode(SPEED_MAX_LED_OUT, OUTPUT);
 }
-
-Scheduler taskRunner;
-
-Task stationTask(CLOCKIE_INTERVAL, TASK_FOREVER, &toggleClockTickIndicator, &taskRunner, true);
 
 void loop()
 {

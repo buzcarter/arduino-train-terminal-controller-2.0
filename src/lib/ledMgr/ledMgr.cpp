@@ -44,7 +44,7 @@ bool isLEDTestDone()
   return false;
 }
 
-void toggleClockTickIndicator()
+void updateClockIndicator()
 {
   static int tick = 0;
   digitalWrite(CLOCK_LED_OUT, tick % CLOCKIE_ON_RATIO == 0 ? ON : OFF);
