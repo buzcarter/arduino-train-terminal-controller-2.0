@@ -20,17 +20,18 @@ Task feedbackTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &sendFeedbackTask, &taskRun
 
 void checkStationsTask()
 {
+  if (!pendingActionsResolved())
+  {
+    return;
+  }
+
   if (isAtTerminus())
   {
-    stationTask.disable();
     reverseDirection();
-    stationTask.enable();
   }
   else if (isAtMiddleStation())
   {
-    stationTask.disable();
     pauseAndResume();
-    stationTask.enable();
   }
 }
 

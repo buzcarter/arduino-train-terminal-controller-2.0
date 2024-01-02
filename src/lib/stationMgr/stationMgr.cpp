@@ -3,6 +3,32 @@
 #include <ledMgr.h>
 
 int trainDirection;
+unsigned long delayExpiry = 0;
+
+void setDirection(int direction)
+{
+  trainDirection = direction;
+  showDirection(direction);
+}
+
+String getDirection()
+{
+  return (trainDirection == FORWARD) ? "forward" : "reverse";
+}
+
+bool hasDelay()
+{
+  if (millis() >= delayExpiry)
+  {
+    delayExpiry = 0;
+  }
+  return delayExpiry > 0;
+}
+
+void setDelay(int length)
+{
+  delayExpiry = millis() + length;
+}
 
 /**
  * Check if the train is at a station by reading the IR proximity sensor
@@ -34,35 +60,41 @@ void stopTrain()
   digitalWrite(MOTOR_REVERSE_OUT, OFF);
 }
 
-void startTrain(int direction)
+void startTrain()
 {
-  trainDirection = direction;
-
+  setDelay(0);
   showLayover(false);
-  showDirection(direction);
 
-  digitalWrite(MOTOR_FORWARD_OUT, direction == FORWARD ? ON : OFF);
-  digitalWrite(MOTOR_REVERSE_OUT, direction == REVERSE ? ON : OFF);
+  digitalWrite(MOTOR_FORWARD_OUT, trainDirection == FORWARD ? ON : OFF);
+  digitalWrite(MOTOR_REVERSE_OUT, trainDirection == REVERSE ? ON : OFF);
 }
 
-void stopAndGo(int direction)
+void scheduleTrainStart(int length)
 {
-  stopTrain();
-  delay(5000); // ideally wouldn't block, but this is a simple example
-  startTrain(direction);
+  setDelay(length);
+  // in theory at a later time we'd have a stack of actions, slowDown, speedUp, etc.
+}
+
+bool pendingActionsResolved()
+{
+  if (hasDelay())
+  {
+    return false;
+  }
+
+  startTrain();
+  return true;
 }
 
 void reverseDirection()
 {
-  stopAndGo(trainDirection == FORWARD ? REVERSE : FORWARD);
+  stopTrain();
+  setDirection(trainDirection == FORWARD ? REVERSE : FORWARD);
+  scheduleTrainStart(3000);
 }
 
 void pauseAndResume()
 {
-  stopAndGo(trainDirection);
-}
-
-String getDirection()
-{
-  return (trainDirection == FORWARD) ? "forward" : "reverse";
+  stopTrain();
+  scheduleTrainStart(6000);
 }
