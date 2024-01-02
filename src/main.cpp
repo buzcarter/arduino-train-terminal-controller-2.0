@@ -1,22 +1,25 @@
 #include <Arduino.h>
 #include <constants.h>
 #include <ledMgr.h>
+#include <msgMgr.h>
 #include <speedMgr.h>
 #include <stationMgr.h>
 #include <TaskScheduler.h>
 
 const int MAIN_TASKS_INTERVAL = 200;
+const int INFO_TASKS_INTERVAL = 1000;
+const int SPEED_SAMPLING_INTERVAL = 50;
 
 Scheduler taskRunner;
 
 void checkStationsTask();
 void updateSpeedTask();
-void sendFeedbackTask();
 
-Task clockIndicatorTask(CLOCKIE_INTERVAL, TASK_FOREVER, &updateClockIndicator, &taskRunner, true);
-Task stationTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &checkStationsTask, &taskRunner, true);
-Task speedTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &updateSpeedTask, &taskRunner, true);
-Task feedbackTask(MAIN_TASKS_INTERVAL, TASK_FOREVER, &sendFeedbackTask, &taskRunner, true);
+Task t0(CLOCKIE_INTERVAL, TASK_FOREVER, &updateClockIndicator, &taskRunner, true);
+Task t1(MAIN_TASKS_INTERVAL, TASK_FOREVER, &checkStationsTask, &taskRunner, true);
+Task t2(INFO_TASKS_INTERVAL, TASK_FOREVER, &updateSpeedTask, &taskRunner, true);
+Task t3(MAIN_TASKS_INTERVAL, TASK_FOREVER, &msgSendSpeedInfo, &taskRunner, true);
+Task t4(SPEED_SAMPLING_INTERVAL, TASK_FOREVER, &sampleSpeed, &taskRunner, true);
 
 void checkStationsTask()
 {
@@ -38,11 +41,6 @@ void checkStationsTask()
 void updateSpeedTask()
 {
   updateSpeed();
-}
-
-void sendFeedbackTask()
-{
-  Serial.println("Speed: " + String(getSpeed()) + " " + getDirection());
 }
 
 void setup()
