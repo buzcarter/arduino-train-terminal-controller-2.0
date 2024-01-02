@@ -55,31 +55,21 @@ void showSpeed(int speed)
 {
   const int speedPrct = map(speed, 0, 255, 0, 100);
 
-  digitalWrite(SPEED_MIN_LED_OUT, OFF);
-  digitalWrite(SPEED_20_LED_OUT, OFF);
-  digitalWrite(SPEED_40_LED_OUT, OFF);
-  digitalWrite(SPEED_80_LED_OUT, OFF);
-  digitalWrite(SPEED_MAX_LED_OUT, OFF);
-
   if (speedPrct < 20)
   {
     digitalWrite(SPEED_MIN_LED_OUT, ON);
-  }
-  else if (speedPrct < 40)
-  {
-    digitalWrite(SPEED_20_LED_OUT, ON);
-  }
-  else if (speedPrct < 60)
-  {
-    digitalWrite(SPEED_40_LED_OUT, ON);
-  }
-  else if (speedPrct < 80)
-  {
-    digitalWrite(SPEED_80_LED_OUT, ON);
+    digitalWrite(SPEED_20_LED_OUT, OFF);
+    digitalWrite(SPEED_40_LED_OUT, OFF);
+    digitalWrite(SPEED_80_LED_OUT, OFF);
+    digitalWrite(SPEED_MAX_LED_OUT, OFF);
   }
   else
   {
-    digitalWrite(SPEED_MAX_LED_OUT, ON);
+    digitalWrite(SPEED_MIN_LED_OUT, OFF);
+    digitalWrite(SPEED_20_LED_OUT, ON);
+    digitalWrite(SPEED_40_LED_OUT, speedPrct > 40 ? ON : OFF);
+    digitalWrite(SPEED_80_LED_OUT, speedPrct > 60 ? ON : OFF);
+    digitalWrite(SPEED_MAX_LED_OUT, speedPrct > 80 ? ON : OFF);
   }
 }
 
