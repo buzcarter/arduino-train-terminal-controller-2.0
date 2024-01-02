@@ -25,33 +25,32 @@ void setup()
 }
 
 void clockie() {
-  static int clockTick = 0;
-  static bool isOn = false;
-  clockTick++;
-  if (clockTick % 12 == 0) {
-    isOn = !isOn;
-  }
-  digitalWrite(CLOCK_LED_OUT, isOn ? HIGH : LOW);
-
+  static int flashTick = 0;
+  flashTick++;
+  digitalWrite(CLOCK_LED_OUT, flashTick % 3 == 0 ? ON : OFF);
 }
+
+Scheduler taskRunner;
+
+Task stationTask(333, TASK_FOREVER, &clockie, &taskRunner, true);
 
 void loop()
 {
-  clockie();
+  taskRunner.execute();
 
-  static bool isOn = false;
-  isOn = !isOn;
-  int value = isOn ? LOW : HIGH;
+  // static bool isOn = false;
+  // isOn = !isOn;
+  // int value = isOn ? LOW : HIGH;
 
 
-  digitalWrite(FORWARD_LED_OUT, value);
-  digitalWrite(LAYOVER_LED_OUT, value);
+  // digitalWrite(FORWARD_LED_OUT, value);
+  // digitalWrite(LAYOVER_LED_OUT, value);
 
-  digitalWrite(SPEED_MIN_LED_OUT, ON);
-  digitalWrite(SPEED_20_LED_OUT, ON);
-  digitalWrite(SPEED_40_LED_OUT, ON);
-  digitalWrite(SPEED_80_LED_OUT, ON);
-  digitalWrite(SPEED_MAX_LED_OUT, ON);
+  // digitalWrite(SPEED_MIN_LED_OUT, ON);
+  // digitalWrite(SPEED_20_LED_OUT, ON);
+  // digitalWrite(SPEED_40_LED_OUT, ON);
+  // digitalWrite(SPEED_80_LED_OUT, ON);
+  // digitalWrite(SPEED_MAX_LED_OUT, ON);
 
-  delay(100);
+  // delay(100);
 }
