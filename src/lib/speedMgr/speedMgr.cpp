@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <constants.h>
+#include <ledMgr.h>
 
 int trainSpeed;
 
@@ -11,9 +12,10 @@ int trainSpeed;
  */
 void updateSpeed()
 {
-  int potValue = analogRead(POTENTIOMETER);
+  int potValue = analogRead(POTENTIOMETER_INPUT);
   trainSpeed = map(potValue, 0, 1023, 0, 255);
-  analogWrite(MOTOR_SPEED, trainSpeed);
+  analogWrite(MOTOR_SPEED_OUT, trainSpeed);
+  showSpeed(trainSpeed);
 }
 
 int getSpeed()

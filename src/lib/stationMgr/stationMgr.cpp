@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <constants.h>
+#include <ledMgr.h>
 
 int trainDirection;
 
@@ -14,7 +15,7 @@ bool isAtStation(uint8_t pin)
 
 bool isAtTerminus()
 {
-  return isAtStation(TERMINUS_1) || isAtStation(TERMINUS_2);
+  return isAtStation(TERMINUS_1_INPUT) || isAtStation(TERMINUS_2_INPUT);
 }
 
 /**
@@ -22,20 +23,26 @@ bool isAtTerminus()
  */
 bool isAtMiddleStation()
 {
-  return isAtStation(MID_STATION_1);
+  return isAtStation(MID_STATION_1_INPUT);
 }
 
 void stopTrain()
 {
-  digitalWrite(MOTOR_FORWARD, OFF);
-  digitalWrite(MOTOR_REVERSE, OFF);
+  showLayover(true);
+
+  digitalWrite(MOTOR_FORWARD_OUT, OFF);
+  digitalWrite(MOTOR_REVERSE_OUT, OFF);
 }
 
 void startTrain(int direction)
 {
   trainDirection = direction;
-  digitalWrite(MOTOR_FORWARD, direction == FORWARD ? ON : OFF);
-  digitalWrite(MOTOR_REVERSE, direction == REVERSE ? ON : OFF);
+
+  showLayover(false);
+  showDirection(direction);
+
+  digitalWrite(MOTOR_FORWARD_OUT, direction == FORWARD ? ON : OFF);
+  digitalWrite(MOTOR_REVERSE_OUT, direction == REVERSE ? ON : OFF);
 }
 
 void stopAndGo(int direction)
