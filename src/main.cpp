@@ -46,7 +46,7 @@ void setup()
 
   pinMode(CLOCK_LED_OUT, OUTPUT);
 
-  pinMode(FORWARD_LED_OUT, OUTPUT);
+  pinMode(DIRECTION_LED_OUT, OUTPUT);
   pinMode(LAYOVER_LED_OUT, OUTPUT);
 
   pinMode(SPEED_MIN_LED_OUT, OUTPUT);

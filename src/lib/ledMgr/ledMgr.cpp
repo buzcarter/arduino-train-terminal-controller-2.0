@@ -32,7 +32,7 @@ bool isLEDTestDone()
 
   digitalWrite(CLOCK_LED_OUT, val);
 
-  digitalWrite(FORWARD_LED_OUT, val);
+  digitalWrite(DIRECTION_LED_OUT, val);
   digitalWrite(LAYOVER_LED_OUT, val);
 
   digitalWrite(SPEED_MIN_LED_OUT, val);
@@ -75,7 +75,7 @@ void updateSpeedLEDs(int speed)
 
 void updateDirectionLED(int direction)
 {
-  digitalWrite(FORWARD_LED_OUT, direction == FORWARD ? ON : OFF);
+  digitalWrite(DIRECTION_LED_OUT, direction == FORWARD ? ON : OFF);
 }
 
 void updateLayoverLED(bool isStopped)

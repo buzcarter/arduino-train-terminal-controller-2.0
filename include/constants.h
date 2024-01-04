@@ -7,15 +7,14 @@ const int FORWARD  = 0;
 const int REVERSE  = 1;
 
 // Arduino (Output) Digital PWM Pins to Motor Driver
-const int MOTOR_SPEED_OUT       = 3;
-const int MOTOR_FORWARD_OUT     = 5;
-const int MOTOR_REVERSE_OUT     = 6;
+const int MOTOR_REVERSE_OUT     = 3;
+const int MOTOR_FORWARD_OUT     = 4;
+const int MOTOR_SPEED_OUT       = 5;
 
 // LED Output Pins
-const int FORWARD_LED_OUT       = 4;
+const int CLOCK_LED_OUT         = 6;
 const int LAYOVER_LED_OUT       = 7;
-
-const int CLOCK_LED_OUT         = 8;
+const int DIRECTION_LED_OUT     = 8;
 
 const int SPEED_MIN_LED_OUT     = 9;
 const int SPEED_20_LED_OUT      = 10;
