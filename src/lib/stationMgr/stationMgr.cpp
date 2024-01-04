@@ -13,7 +13,7 @@ void setDirection(int direction)
     return;
   }
   trainDirection = direction;
-  showDirection(direction);
+  updateDirectionLED(direction);
   msgReversingDirection();
 }
 
@@ -86,7 +86,7 @@ bool isAtMiddleStation()
 
 void stopTrain()
 {
-  showLayover(true);
+  updateLayoverLED(true);
   msgStopped();
 
   digitalWrite(MOTOR_FORWARD_OUT, OFF);
@@ -96,7 +96,7 @@ void stopTrain()
 void startTrain()
 {
   setDelay(0);
-  showLayover(false);
+  updateLayoverLED(false);
   msgStart();
   digitalWrite(MOTOR_FORWARD_OUT, trainDirection == FORWARD ? ON : OFF);
   digitalWrite(MOTOR_REVERSE_OUT, trainDirection == REVERSE ? ON : OFF);

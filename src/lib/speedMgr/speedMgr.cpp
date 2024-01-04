@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <constants.h>
 #include <ledMgr.h>
+// #include <msgMgr.h>
 
 const int NUM_SAMPLES = 5;
 
@@ -29,11 +30,14 @@ int getAvgSpeed()
   }
 
   int speed = sum / NUM_SAMPLES;
+  // int inputSpeed = speed;
   speed = map(speed, 0, 1023, 0, 255);
+  // int adjustedSpeed = speed;
   if (speed >= lastSpeed - 2 && speed <= lastSpeed + 2)
   {
     return lastSpeed;
   }
+  // msgDebug(inputSpeed, adjustedSpeed);
   lastSpeed = speed;
   return speed;
 }
@@ -53,7 +57,7 @@ void updateSpeed()
   }
   trainSpeed = speed;
   analogWrite(MOTOR_SPEED_OUT, trainSpeed);
-  showSpeed(trainSpeed);
+  updateSpeedLEDs(trainSpeed);
 }
 
 int getSpeed()
