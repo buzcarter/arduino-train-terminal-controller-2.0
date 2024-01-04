@@ -1,4 +1,4 @@
-void msgArrivedAtStation(String station);
+void msgArrivedAtStation(String);
 void msgReversingDirection();
 void msgSendSpeedInfo();
 void msgStart();

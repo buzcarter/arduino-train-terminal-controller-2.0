@@ -32,7 +32,7 @@ bool isLEDTestDone()
 
   digitalWrite(CLOCK_LED_OUT, val);
 
-  digitalWrite(FORWARD_LED_OUT, val);
+  digitalWrite(DIRECTION_LED_OUT, val);
   digitalWrite(LAYOVER_LED_OUT, val);
 
   digitalWrite(SPEED_MIN_LED_OUT, val);
@@ -44,14 +44,14 @@ bool isLEDTestDone()
   return false;
 }
 
-void updateClockIndicator()
+void updateClockLED()
 {
   static int tick = 0;
   digitalWrite(CLOCK_LED_OUT, tick % CLOCKIE_ON_RATIO == 0 ? ON : OFF);
   tick++;
 }
 
-void showSpeed(int speed)
+void updateSpeedLEDs(int speed)
 {
   const int speedPrct = map(speed, 0, 255, 0, 100);
 
@@ -73,12 +73,12 @@ void showSpeed(int speed)
   }
 }
 
-void showDirection(int direction)
+void updateDirectionLED(int direction)
 {
-  digitalWrite(FORWARD_LED_OUT, direction == FORWARD ? ON : OFF);
+  digitalWrite(DIRECTION_LED_OUT, direction == FORWARD ? ON : OFF);
 }
 
-void showLayover(bool isStopped)
+void updateLayoverLED(bool isStopped)
 {
   digitalWrite(LAYOVER_LED_OUT, isStopped ? ON : OFF);
 }

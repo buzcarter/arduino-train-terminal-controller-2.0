@@ -1,8 +1,10 @@
+/** what proportion of the blink interval should the clock be on? 3 = 1/3 of 1 second */
 const int CLOCKIE_ON_RATIO = 3;
-const int CLOCKIE_INTERVAL = 1000 / CLOCKIE_ON_RATIO ;
+/** ticks between time checks */
+const int CLOCK_LED_PULSE_INTERVAL = 1000 / CLOCKIE_ON_RATIO ;
 
 bool isLEDTestDone();
-void showDirection(int direction);
-void showLayover(bool isStopped);
-void showSpeed(int speed);
-void updateClockIndicator();
+void updateDirectionLED(int direction);
+void updateLayoverLED(bool isStopped);
+void updateSpeedLEDs(int speed);
+void updateClockLED();

@@ -53,7 +53,7 @@ void updateSpeed()
   }
   trainSpeed = speed;
   analogWrite(MOTOR_SPEED_OUT, trainSpeed);
-  showSpeed(trainSpeed);
+  updateSpeedLEDs(trainSpeed);
 }
 
 int getSpeed()

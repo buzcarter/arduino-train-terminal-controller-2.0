@@ -45,7 +45,7 @@ Direction of travel -- "Left" or "Right", "Forward" or "Reverse" -- are complete
 
 ## Circuit Diagram
 
-![Circut Diagram/Schematic](./docs/images/Wiring-Diagram-Fritzing.png)
+![Circut Diagram/Schematic](./docs/images/Wiring-Diagram-Fritzing.2.1.png)
 
 (check the "docs/fritzing" directory for the Wiring Diagram and additional part definition (found on very helpful Fritzing forums)
 

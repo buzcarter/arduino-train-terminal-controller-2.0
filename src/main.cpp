@@ -14,7 +14,7 @@ Scheduler taskRunner;
 
 void checkStationsTask();
 
-Task t0(CLOCKIE_INTERVAL, TASK_FOREVER, &updateClockIndicator, &taskRunner, true);
+Task t0(CLOCK_LED_PULSE_INTERVAL, TASK_FOREVER, &updateClockLED, &taskRunner, true);
 Task t1(MAIN_TASKS_INTERVAL, TASK_FOREVER, &checkStationsTask, &taskRunner, true);
 Task t2(INFO_TASKS_INTERVAL, TASK_FOREVER, &updateSpeed, &taskRunner, true);
 Task t3(MAIN_TASKS_INTERVAL, TASK_FOREVER, &msgSendSpeedInfo, &taskRunner, true);
@@ -46,7 +46,7 @@ void setup()
 
   pinMode(CLOCK_LED_OUT, OUTPUT);
 
-  pinMode(FORWARD_LED_OUT, OUTPUT);
+  pinMode(DIRECTION_LED_OUT, OUTPUT);
   pinMode(LAYOVER_LED_OUT, OUTPUT);
 
   pinMode(SPEED_MIN_LED_OUT, OUTPUT);
