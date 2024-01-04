@@ -52,20 +52,23 @@ String getStationName(uint8_t pin)
 }
 
 /**
- * Check if the train is at a station by reading the IR proximity sensor
- * (corresponding to `pin`) and comparing it to the threshold.
+ * Check if the train has *arrived* at a station by reading the IR proximity
+ * sensor (corresponding to `pin`) and comparing it to the threshold.
+ * After returning `true` for a given station this will not return `true` again
+ * until after the train has visited a different station.
  */
 bool isAtStation(uint8_t pin)
 {
-  static int lastState = false;
+  static uint8_t lastStation;
+
   const bool isAtStation = analogRead(pin) < SENSOR_THRESHOLD;
-  if (lastState == isAtStation)
+  if (isAtStation && lastStation == pin)
   {
     return false;
   }
-  lastState = isAtStation;
   if (isAtStation)
   {
+    lastStation = pin;
     msgArrivedAtStation(getStationName(pin) + " (pin " + String(pin) + ")");
   }
   return isAtStation;

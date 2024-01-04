@@ -7,7 +7,7 @@ void msgSendSpeedInfo()
   static String lastMsg = "";
   int speed = getSpeed();
   int prct = (speed * 100) / 255;
-  String msg = "Speed: " + String(prct) + "% (" + String((speed)) + ") " + getDirection();
+  String msg = "Power " + String(prct) + "% (" + String((speed)) + ") " + getDirection();
   if (msg == lastMsg)
   {
     return;
